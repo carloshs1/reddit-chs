@@ -38,7 +38,6 @@ const PostBox: React.FC = () => {
      topic: subreddit,
     },
    })
-   console.warn({ getSubredditListByTopic })
 
    const imageForPost = image || ''
    const subredditExist = !!getSubredditListByTopic.length
@@ -56,7 +55,6 @@ const PostBox: React.FC = () => {
       username: session?.user?.name,
      },
     })
-    console.warn({ newPost })
    } else {
     // Create subreddit...
     const {
@@ -66,7 +64,6 @@ const PostBox: React.FC = () => {
       topic: subreddit,
      },
     })
-    console.warn({ newSubreddit })
 
     const {
      data: { insertPost: newPost },
@@ -79,7 +76,6 @@ const PostBox: React.FC = () => {
       username: session?.user?.name,
      },
     })
-    console.warn({ newPost })
    }
 
    setValue('title', '')
@@ -90,7 +86,7 @@ const PostBox: React.FC = () => {
     id: notification,
    })
   } catch (err) {
-   console.warn({ err })
+   // console.warn({ err })
    toast.error('Whoops! Something went wrong :(', {
     id: notification,
    })
