@@ -34,13 +34,36 @@ const Post: React.FC<{ post: PostType }> = ({ post }) => {
     </div>
 
     {/* Body */}
-    <div></div>
+    <div className="py-4">
+     <h2 className="text-xl font-semibold">{post.title}</h2>
+     <p className="mt-2 text-sm font-light">{post.body}</p>
+    </div>
 
     {/* Image */}
-    <div></div>
+    <img className="w-full" src={post.image} alt="" />
 
     {/* Footer */}
-    <div></div>
+    <div className="flex space-x-4 text-gray-400">
+     <div className="postButtons">
+      <ChatBubbleOvalLeftEllipsisIcon className="h-6 w-6" />
+      <p>{post.comments.length} Comments</p>
+     </div>
+     <div className="postButtons">
+      <GifIcon className="h-6 w-6" />
+      <p className="hidden sm:inline">Award</p>
+     </div>
+     <div className="postButtons">
+      <ShareIcon className="h-6 w-6" />
+      <p className="hidden sm:inline">Share</p>
+     </div>
+     <div className="postButtons">
+      <BookmarkIcon className="h-6 w-6" />
+      <p className="hidden sm:inline">Save</p>
+     </div>
+     <div className="postButtons">
+      <EllipsisHorizontalIcon className="h-6 w-6" />
+     </div>
+    </div>
    </div>
   </div>
  )

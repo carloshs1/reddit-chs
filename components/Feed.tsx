@@ -9,7 +9,7 @@ const Feed: React.FC = () => {
  const posts: PostType[] = data?.getPostList
 
  return (
-  <div>
+  <div className="mt-5 space-y-4">
    {posts?.map((post) => (
     <Post key={post.id} post={post} />
    ))}
