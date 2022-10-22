@@ -9,7 +9,9 @@ import client from '../apollo-client'
 import { GET_ALL_POSTS, GET_SUBREDDIT_BY_TOPIC } from '../graphql/queries'
 import toast from 'react-hot-toast'
 
-const PostBox: React.FC = () => {
+const PostBox: React.FC<{ subreddit?: string }> = ({
+ subreddit: subredditProp,
+}) => {
  const { data: session } = useSession()
  const [addPost] = useMutation(ADD_POST, {
   refetchQueries: [GET_ALL_POSTS, 'getPostList'],
@@ -37,7 +39,7 @@ const PostBox: React.FC = () => {
    } = await client.query({
     query: GET_SUBREDDIT_BY_TOPIC,
     variables: {
-     topic: subreddit,
+     topic: subredditProp || subreddit,
     },
    })
 
@@ -63,7 +65,7 @@ const PostBox: React.FC = () => {
      data: { insertSubreddit: newSubreddit },
     } = await addSubreddit({
      variables: {
-      topic: subreddit,
+      topic: subredditProp || subreddit,
      },
     })
 
@@ -98,7 +100,7 @@ const PostBox: React.FC = () => {
  return (
   <form
    onSubmit={onSubmit}
-   className="sticky top-16 z-50 rounded-md bg-white border border-gray-300 p-2"
+   className="sticky top-20 z-50 rounded-md bg-white border border-gray-300 p-2"
   >
    <div className="flex items-center space-x-3">
     <Avatar />
@@ -108,7 +110,11 @@ const PostBox: React.FC = () => {
      disabled={!session}
      className="flex-1 rounded-md bg-gray-50 p-2 pl-5 outline-none"
      placeholder={
-      session ? 'Create post by entering a title' : 'Sign in to post'
+      session
+       ? subredditProp
+         ? `Create a post in r/${subredditProp}`
+         : 'Create post by entering a title'
+       : 'Sign in to post'
      }
     />
     <PhotoIcon
@@ -131,15 +137,17 @@ const PostBox: React.FC = () => {
       />
      </div>
 
-     <div className="flex items-center px-2">
-      <p className="min-w-[90px]">Subreddit:</p>
-      <input
-       {...register('subreddit', { required: true })}
-       className="m-2 flex-1 bg-blue-50 p-2 outline-none"
-       type="text"
-       placeholder="i.e. reactjs"
-      />
-     </div>
+     {!subredditProp && (
+      <div className="flex items-center px-2">
+       <p className="min-w-[90px]">Subreddit:</p>
+       <input
+        {...register('subreddit', { required: true })}
+        className="m-2 flex-1 bg-blue-50 p-2 outline-none"
+        type="text"
+        placeholder="i.e. reactjs"
+       />
+      </div>
+     )}
 
      {imageBoxOpen && (
       <div className="flex items-center px-2">
