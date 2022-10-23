@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
  ArrowDownIcon,
  ArrowUpIcon,
@@ -11,16 +11,83 @@ import {
 import Avatar from './Avatar'
 import TimeAgo from 'react-timeago'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
+import toast from 'react-hot-toast'
+import { useMutation, useQuery } from '@apollo/client'
+import { GET_VOTES_BY_POST_ID } from '../graphql/queries'
+import { ADD_VOTE } from '../graphql/mutations'
 
 const Post: React.FC<{ post: PostType }> = ({ post }) => {
+ const { data: session } = useSession()
+ const [vote, setVote] = useState<boolean>()
+ const { data, loading, error } = useQuery(GET_VOTES_BY_POST_ID, {
+  variables: {
+   post_id: post?.id,
+  },
+ })
+ const [addVote] = useMutation(ADD_VOTE, {
+  refetchQueries: [GET_VOTES_BY_POST_ID, 'getVotesByPostId'],
+ })
+ const upVote = async (isUpVote: boolean) => {
+  if (!session) {
+   toast('Sign in to Vote!')
+   return
+  }
+  if ((vote && isUpVote) || (vote === false && !isUpVote)) {
+   return
+  } else {
+   try {
+    await addVote({
+     variables: {
+      post_id: post.id,
+      username: session.user?.name,
+      upvote: isUpVote,
+     },
+    })
+   } catch (error) {
+    toast.error('Something went wrong with your vote :(')
+   }
+  }
+ }
+
+ useEffect(() => {
+  const votes: VoteType[] = data?.getVotesByPostId
+  const upVote = votes?.find(
+   (vote) => vote.username === session?.user?.name
+  )?.upvote
+  setVote(upVote)
+ }, [data])
+
+ const displayVotes: (data: { getVotesByPostId: VoteType[] }) => number = (
+  data
+ ) => {
+  const votes = data?.getVotesByPostId
+  if (!votes?.length) return 0
+  const displayNumber = votes?.reduce(
+   (total: number, vote: VoteType) =>
+    vote.upvote ? (total += 1) : (total -= 1),
+   0
+  )
+  if (!displayNumber) return votes[0]?.upvote ? 1 : -1
+  return displayNumber
+ }
+
  return (
   <Link href={`/post/${post.id}`}>
    <div className="flex cursor-pointer rounded-md border border-gray-300 bg-white shadow-sm hover:border-gray-600">
     {/* Votes */}
     <div className="flex flex-col items-center justify-start space-y-1 rounded-l-md bg-gray-50 p-4 text-gray-400">
-     <ArrowUpIcon className="voteButton hover:text-blue-400" />
-     <p className="text-black text-xs font-bold">0</p>
-     <ArrowDownIcon className="voteButton hover:text-red-400" />
+     <ArrowUpIcon
+      className={`voteButton hover:text-blue-400 ${vote && 'text-blue-400'}`}
+      onClick={() => upVote(true)}
+     />
+     <p className="text-black text-xs font-bold">{displayVotes(data)}</p>
+     <ArrowDownIcon
+      className={`voteButton hover:text-red-400 ${
+       vote === false && 'text-red-400'
+      }`}
+      onClick={() => upVote(false)}
+     />
     </div>
 
     <div className="p-3 pb-1">

@@ -25,6 +25,17 @@ export const ADD_POST = gql`
   }
  }
 `
+export const ADD_VOTE = gql`
+ mutation MyMutation($post_id: ID!, $username: String!, $upvote: Boolean!) {
+  insertVote(post_id: $post_id, username: $username, upvote: $upvote) {
+   id
+   post_id
+   username
+   upvote
+   created_at
+  }
+ }
+`
 export const ADD_COMMENT = gql`
  mutation MyMutation($post_id: ID!, $username: String!, $text: String!) {
   insertComment(post_id: $post_id, username: $username, text: $text) {
