@@ -12,7 +12,7 @@ const Feed: React.FC<{ topic?: string }> = ({ topic }) => {
  const posts: PostType[] = topic ? data?.getPostListByTopic : data?.getPostList
 
  return (
-  <div className="mt-5 space-y-4">
+  <div className="flex-1 mt-5 space-y-4">
    {loading && (
     <div className="flex w-full p-10 text-xl items-center justify-center">
      <Jelly size={50} speed={0.9} color="#ff4501" />
